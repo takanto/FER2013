@@ -12,14 +12,14 @@ class EfficientChannelAttention(layers.Layer):
         self.conv = layers.Conv1D(filters=1, kernel_size=self.k_size, padding='same', kernel_initializer='glorot_uniform', use_bias=False,)
 
     def call(self, x):
-        B, H, W, C = x.shape
+        _, H, W, C = x.shape
         squeeze = tf.reduce_mean(x, axis=[1, 2], keepdims=True)
         attn = self.conv(squeeze)
         attn = tf.squeeze(attn, axis=1)
         attn = tf.math.sigmoid(attn)
         attn = tf.expand_dims(attn, axis=1)
         x =  x * attn
-        x = tf.reshape(x, (B, H*W, C))
+        x = tf.reshape(x, (-1, H*W, C))
         return x
     
 
