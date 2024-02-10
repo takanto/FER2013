@@ -473,7 +473,7 @@ class PatchEmbedding(layers.Layer):
         self.pos_embed = layers.Embedding(input_dim=num_patch, output_dim=embed_dim)
 
     def call(self, patch):
-        pos = tf.arange(start=0, stop=self.num_patch)
+        pos = tf.range(start=0, stop=self.num_patch)
         return self.proj(patch) + self.pos_embed(pos)
 
 
