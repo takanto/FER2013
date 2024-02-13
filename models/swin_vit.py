@@ -2,7 +2,6 @@ import tensorflow as tf
 from tensorflow.keras import layers
 import numpy as np
 
-
 class WindowbasedMultiheadedSelfAttention(layers.Layer):
     def __init__(self, dim, window_size, num_heads, qkv_bias=True, dropout_rate=0.0, **kwargs,):
         super(WindowbasedMultiheadedSelfAttention, self).__init__(**kwargs)
