@@ -15,12 +15,12 @@ To make the repo concise, google colab notebooks used for the project are linked
 
 | Vision Transformers| |
 | :--- | :---:        |
-|ViT | [BasicSR_inference_DFDNet.ipynb](https://colab.research.google.com/drive/1RoNDeipp9yPjI3EbpEbUhn66k5Uzg4n8?usp=sharing)|
-|Hybrid ViT |[BasicSR_inference_ESRGAN.ipynb](https://colab.research.google.com/drive/1JQScYICvEC3VqaabLu-lxvq9h7kSV1ML?usp=sharing)|
-|EHAT |[BasicSR_inference_ESRGAN.ipynb](https://colab.research.google.com/drive/1JQScYICvEC3VqaabLu-lxvq9h7kSV1ML?usp=sharing)|
+|ViT | [Vision Transformer.ipynb](https://colab.research.google.com/drive/1wL22qJ0958MwynU40pNDIUO9BfhljDur?usp=sharing)|
+|Hybrid ViT |[Hybrid Vision Transformer.ipynb](https://colab.research.google.com/drive/1mr49fz5SCCbSyXP8Ofzs9yd2fQVlIbz6?usp=sharing)|
+|EHAT |[Hybrid Attention Transformer.ipynb](https://colab.research.google.com/drive/1woihCnEY4YmTC4_Xr4aW4JoE847CIhOo?usp=sharing)|
 
 | Graph Neural Networks| |
 | :--- | :---:        |
-|GCN | [BasicSR_inference_DFDNet.ipynb](https://colab.research.google.com/drive/1RoNDeipp9yPjI3EbpEbUhn66k5Uzg4n8?usp=sharing)|
-|GAT |[BasicSR_inference_ESRGAN.ipynb](https://colab.research.google.com/drive/1JQScYICvEC3VqaabLu-lxvq9h7kSV1ML?usp=sharing)|
-|GATv2 |[BasicSR_inference_ESRGAN.ipynb](https://colab.research.google.com/drive/1JQScYICvEC3VqaabLu-lxvq9h7kSV1ML?usp=sharing)|
+|GCN | [Graph Convolutional Network.ipynb](https://colab.research.google.com/drive/1YdudXAhbol1_Cp_jz9-dbplBfQu24Eh2?usp=sharing)|
+|GAT |[Graph Attention Network.ipynb](https://colab.research.google.com/drive/16eaUHPgpLSE5FTDG4WsF4NTyv0vNW9cK?usp=sharing)|
+|GATv2 |[Graph Attention Network.ipynb](https://colab.research.google.com/drive/16eaUHPgpLSE5FTDG4WsF4NTyv0vNW9cK?usp=sharing)|
