@@ -12,6 +12,7 @@ class GraphAttention(layers.Layer):
         self.conv1d = layers.Conv1D(self.num_filters, kernel_size=1, use_bias=False)
         self.a = layers.Conv1D(1, kernel_size=1)
         self.leaky_relu = layers.LeakyReLU(0.2)
+        self.bias = tf.Variable(initial_value=tf.zeros(shape=(num_filters)))
 
     def call(self, x, A):
         if self.in_drop != 0.0:
@@ -32,7 +33,7 @@ class GraphAttention(layers.Layer):
             x = tf.nn.dropout(x, 1.0 - self.in_drop)
         
         x = tf.matmul(a, x)
-        x = tf.contrib.layers.bias_add(x)
+        x = x + self.bias
         
         if self.residual:
             if x_skip.shape[-1] != x.shape[-1]:
