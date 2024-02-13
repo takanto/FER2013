@@ -9,10 +9,13 @@ class GraphAttention(layers.Layer):
         self.in_drop = in_drop
         self.coef_drop = coef_drop
         self.residual = residual
+        
+
+    def build(self, input_shape):
         self.conv1d = layers.Conv1D(self.num_filters, kernel_size=1, use_bias=False)
         self.a = layers.Conv1D(1, kernel_size=1)
         self.leaky_relu = layers.LeakyReLU(0.2)
-        self.bias = tf.Variable(initial_value=tf.zeros(shape=(num_filters)))
+        self.bias = tf.Variable(initial_value=tf.zeros(shape=(self.num_filters)))
 
     def call(self, x, A):
         if self.in_drop != 0.0:
@@ -69,6 +72,12 @@ class GraphAttentionV2(layers.Layer):
         self.a = layers.Conv1D(num_nodes, kernel_size=1)
         self.leaky_relu = layers.LeakyReLU(0.2)
         self.bias = tf.Variable(initial_value=tf.zeros(shape=(num_filters)))
+
+    def build(self, input_shape):
+        self.conv1d = layers.Conv1D(1, kernel_size=1, use_bias=False)
+        self.a = layers.Conv1D(self.num_nodes, kernel_size=1)
+        self.leaky_relu = layers.LeakyReLU(0.2)
+        self.bias = tf.Variable(initial_value=tf.zeros(shape=(self.num_filters)))
 
     def call(self, x, A):
         if self.in_drop != 0.0:
