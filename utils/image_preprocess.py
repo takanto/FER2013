@@ -22,12 +22,14 @@ def data_augmentations(X, y, df, rotation_range=10, width_shift_range=0.1, heigh
 
   target_count = max(df['emotion'].value_counts())
 
+  distribution = []
 
   for class_label in df['emotion'].unique():
       class_indices = np.where(y[:, class_label] == 1)[0]
       class_images = X[class_indices]
       class_labels = y[class_indices]
       num_images = class_images.shape[0]
+      distribution.append(num_images)
       
       augmentations_needed = target_count - num_images
       
@@ -50,7 +52,7 @@ def data_augmentations(X, y, df, rotation_range=10, width_shift_range=0.1, heigh
   balanced_X = np.array(balanced_X)
   balanced_y = np.array(balanced_y)
 
-  return balanced_X, balanced_y
+  return balanced_X, balanced_y, distribution
 
 def plot_rand_imgs(data, img_size, pred='nan', actual='nan'):
   # images selected
