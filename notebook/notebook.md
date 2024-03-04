@@ -16,6 +16,7 @@ To make the repo concise, google colab notebooks used for the project are linked
 |CBAM |[Channel Block Attention.ipynb](https://colab.research.google.com/drive/19mQtYNa4Md6gjzALE6BB4niLuB5mbCZj?usp=sharing)|
 |ViT | [Vision Transformer.ipynb](https://colab.research.google.com/drive/1wL22qJ0958MwynU40pNDIUO9BfhljDur?usp=sharing)|
 |Hybrid ViT |[Hybrid Vision Transformer.ipynb](https://colab.research.google.com/drive/1mr49fz5SCCbSyXP8Ofzs9yd2fQVlIbz6?usp=sharing)|
+|Swin Transformer |[Swin Transformer.ipynb](https://colab.research.google.com/drive/1UG8eiPpY2qsQE13SI7st0z_HBgaumji5?usp=sharing)|
 |EHAT |[Hybrid Attention Transformer.ipynb](https://colab.research.google.com/drive/1woihCnEY4YmTC4_Xr4aW4JoE847CIhOo?usp=sharing)|
 
 
