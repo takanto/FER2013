@@ -111,8 +111,8 @@ class ChannelBlockAttentionBlock(layers.Layer):
 
     def call(self, x):
         x_skip = x
-        out = x * self.ca(x)
-        out = out * self.sa(out)
+        out = self.ca(x)
+        out = self.sa(out)
         return out + x_skip
     
 class EfficientChannelBlockAttentionBlock(layers.Layer):
@@ -123,6 +123,6 @@ class EfficientChannelBlockAttentionBlock(layers.Layer):
 
     def call(self, x):
         x_skip = x
-        out = x * self.ca(x)
-        out = out * self.sa(out)
+        out = self.ca(x)
+        out = self.sa(out)
         return out + x_skip

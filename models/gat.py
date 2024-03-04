@@ -59,6 +59,20 @@ class MultiHeadGraphAttention(layers.Layer):
         head_outputs = [head(x, A) for head in self.attention_heads]
         return tf.reduce_mean(head_outputs, axis=0)
     
+class PlainMultiHeadGraphAttention(layers.Layer):
+    def __init__(self, num_heads, num_features, num_filters, threshold, in_drop, coef_drop, residual=False):
+        super(MultiHeadGraphAttention, self).__init__()
+        self.num_heads = num_heads
+        self.threshold = threshold
+        self.attention_heads = []
+        for _ in range(num_heads):
+            self.attention_heads.append(GraphAttention(num_features, num_filters, in_drop, coef_drop, residual))
+
+    def call(self, x, distance_matrix):
+        A = distance_matrix
+        head_outputs = [head(x, A) for head in self.attention_heads]
+        return tf.reduce_mean(head_outputs, axis=0)
+
 class GraphAttentionV2(layers.Layer):
     def __init__(self, num_features, num_filters, num_nodes, in_drop, coef_drop, residual=False):
         super(GraphAttentionV2, self).__init__()
@@ -117,5 +131,19 @@ class MultiHeadGraphAttentionV2(layers.Layer):
 
     def call(self, x, distance_matrix):
         A = tf.cast(distance_matrix<self.threshold, tf.float32)
+        head_outputs = [head(x, A) for head in self.attention_heads]
+        return tf.reduce_mean(head_outputs, axis=0)
+    
+class PlainMultiHeadGraphAttentionV2(layers.Layer):
+    def __init__(self, num_heads, num_features, num_filters, num_nodes, threshold, in_drop, coef_drop, residual=False):
+        super(MultiHeadGraphAttentionV2, self).__init__()
+        self.num_heads = num_heads
+        self.threshold = threshold
+        self.attention_heads = []
+        for _ in range(num_heads):
+            self.attention_heads.append(GraphAttentionV2(num_features, num_filters, num_nodes, in_drop, coef_drop, residual))
+
+    def call(self, x, distance_matrix):
+        A = distance_matrix
         head_outputs = [head(x, A) for head in self.attention_heads]
         return tf.reduce_mean(head_outputs, axis=0)

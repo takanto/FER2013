@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def data_augmentations(X, y, df, rotation_range=10, width_shift_range=0.1, height_shift_range=0.1, zoom_range=0.1, 
-                       brightness_range=(0.95, 1.05), horizontal_flip=True, vertical_flip=True, fill_mode='nearest'):
+                       brightness_range=(0.95, 1.05), horizontal_flip=True, vertical_flip=True, fill_mode='nearest', target_count=None):
   datagen = tf.keras.preprocessing.image.ImageDataGenerator(
       rotation_range=rotation_range,
       width_shift_range=width_shift_range,
@@ -20,7 +20,7 @@ def data_augmentations(X, y, df, rotation_range=10, width_shift_range=0.1, heigh
   balanced_X = []
   balanced_y = []
 
-  target_count = max(df['emotion'].value_counts())
+  target_count = target_count if target_count else max(df['emotion'].value_counts())
 
   distribution = []
 
@@ -29,7 +29,6 @@ def data_augmentations(X, y, df, rotation_range=10, width_shift_range=0.1, heigh
       class_images = X[class_indices]
       class_labels = y[class_indices]
       num_images = class_images.shape[0]
-      distribution.append(num_images)
       
       augmentations_needed = target_count - num_images
       
@@ -51,6 +50,13 @@ def data_augmentations(X, y, df, rotation_range=10, width_shift_range=0.1, heigh
 
   balanced_X = np.array(balanced_X)
   balanced_y = np.array(balanced_y)
+
+  for class_label in df['emotion'].unique():
+      class_indices = np.where(balanced_y[:, class_label] == 1)[0]
+      class_images = balanced_X[class_indices]
+      class_labels = balanced_y[class_indices]
+      num_images = class_images.shape[0]
+      distribution.append(num_images)
 
   return balanced_X, balanced_y, distribution
 

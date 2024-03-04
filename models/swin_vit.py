@@ -136,7 +136,7 @@ class SwinTransformer(layers.Layer):
             mask_array = tf.convert_to_tensor(mask_array)
 
             # mask array to windows
-            mask_windows = window_partition(mask_array, self.window_size)
+            mask_windows = window_partition(mask_array, self.window_size, self.window_size)
             mask_windows = tf.reshape(
                 mask_windows, [-1, self.window_size * self.window_size]
             )
@@ -165,7 +165,7 @@ class SwinTransformer(layers.Layer):
         else:
             shifted_x = x
 
-        x_windows = window_partition(shifted_x, self.window_size)
+        x_windows = window_partition(shifted_x, self.window_size, self.window_size)
         x_windows = tf.reshape(
             x_windows, (-1, self.window_size * self.window_size, channels)
         )
