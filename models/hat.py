@@ -480,8 +480,8 @@ class PatchEmbedding(layers.Layer):
 
 
 class PatchMerging(layers.Layer):
-    def __init__(self, num_patch, embed_dim):
-        super().__init__()
+    def __init__(self, num_patch, embed_dim, **kwargs):
+        super().__init__(**kwargs)
         self.num_patch = num_patch
         self.embed_dim = embed_dim
         self.linear_trans = layers.Dense(2 * embed_dim, use_bias=False)
