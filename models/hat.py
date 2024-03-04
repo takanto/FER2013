@@ -494,6 +494,6 @@ class PatchMerging(layers.Layer):
         x1 = x[:, 1::2, 0::2, :]
         x2 = x[:, 0::2, 1::2, :]
         x3 = x[:, 1::2, 1::2, :]
-        x = tf.concatenate((x0, x1, x2, x3), axis=-1)
+        x = tf.concat((x0, x1, x2, x3), axis=-1)
         x = tf.reshape(x, (-1, (height // 2) * (width // 2), 4 * C))
         return self.linear_trans(x)
