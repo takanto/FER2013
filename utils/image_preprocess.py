@@ -48,6 +48,8 @@ def data_augmentations(X, y, df, rotation_range=10, width_shift_range=0.1, heigh
       balanced_X.extend(class_images)
       balanced_y.extend(class_labels)
 
+  balanced_X = balanced_X[:target_count]
+  balanced_y = balanced_y[:target_count]
   balanced_X = np.array(balanced_X)
   balanced_y = np.array(balanced_y)
 
@@ -87,4 +89,16 @@ def plot_rand_imgs(data, img_size, pred='nan', actual='nan'):
     j += 1
 
   plt.axis('off')
+  plt.show()
+
+def distribution_plot(label_counts):
+  emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+
+  # Plot the bar chart
+  plt.figure(figsize=(6, 4))
+  plt.bar(emotion_labels, label_counts, color='skyblue')
+  plt.title('Distribution of Emotion Labels')
+  plt.xlabel('Emotion Labels')
+  plt.ylabel('Counts')
+  plt.xticks(rotation=45)
   plt.show()
