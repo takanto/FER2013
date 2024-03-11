@@ -48,8 +48,8 @@ def data_augmentations(X, y, df, rotation_range=10, width_shift_range=0.1, heigh
       balanced_X.extend(class_images)
       balanced_y.extend(class_labels)
 
-  balanced_X = balanced_X[:target_count]
-  balanced_y = balanced_y[:target_count]
+  balanced_X = balanced_X[:target_count, :, :, :]
+  balanced_y = balanced_y[:target_count, :]
   balanced_X = np.array(balanced_X)
   balanced_y = np.array(balanced_y)
 
