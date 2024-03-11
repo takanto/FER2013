@@ -119,6 +119,7 @@ def data_augmentations2(X, y, df, rotation_range=10, width_shift_range=0.1, heig
 def plot_rand_imgs(data, img_size, pred='nan', actual='nan'):
   # images selected
   random_ids = np.random.choice(data.shape[0], 9)
+  emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
 
   # for every image, plot it as a subplot
   j = 0
@@ -128,9 +129,11 @@ def plot_rand_imgs(data, img_size, pred='nan', actual='nan'):
     ax.axis('off')
     # if there is a list of predictions, display it as title
     if type(actual) != str:
-      title = f'actual: {actual[i]}'
+      actual_label = emotion_labels[np.argmax(actual[i])]
+      title = f'actual: {actual_label}'
       if type(pred) != str:
-        title += f', pred: {pred[i]}'
+        predicted_label = emotion_labels[np.argmax(pred[i])]
+        title += f', pred: {predicted_label}'
       ax.title.set_text(title)
     # if RGB is stored, convert it to RGB
     img = data[i]
