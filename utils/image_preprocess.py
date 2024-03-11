@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def data_augmentations(X, y, df, rotation_range=10, width_shift_range=0.1, height_shift_range=0.1, zoom_range=0.1, 
-                       brightness_range=(0.95, 1.05), horizontal_flip=True, vertical_flip=True, fill_mode='nearest', target_count=None):
+                       brightness_range=(0.95, 1.05), horizontal_flip=True, vertical_flip=False, fill_mode='nearest', target_count=None):
   datagen = tf.keras.preprocessing.image.ImageDataGenerator(
       rotation_range=rotation_range,
       width_shift_range=width_shift_range,
@@ -48,8 +48,62 @@ def data_augmentations(X, y, df, rotation_range=10, width_shift_range=0.1, heigh
       balanced_X.extend(class_images)
       balanced_y.extend(class_labels)
 
-  balanced_X = balanced_X[:target_count, :, :, :]
-  balanced_y = balanced_y[:target_count, :]
+  balanced_X = np.array(balanced_X)
+  balanced_y = np.array(balanced_y)
+
+  final_X, final_y = [], []
+  for class_label in df['emotion'].unique():
+      class_indices = np.where(balanced_y[:, class_label] == 1)[0]
+      class_images = balanced_X[class_indices][:target_count, :, :, :]
+      class_labels = balanced_y[class_indices][:target_count, :]
+      final_X.extend(class_images)
+      final_y.extend(class_labels)
+      num_images = class_images.shape[0]
+      distribution.append(num_images)
+
+  return np.array(final_X), np.array(final_y), distribution
+
+def data_augmentations2(X, y, df, rotation_range=10, width_shift_range=0.1, height_shift_range=0.1, zoom_range=0.1, 
+                       brightness_range=(0.95, 1.05), horizontal_flip=True, vertical_flip=False, fill_mode='nearest', target_count=None):
+  datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+      rotation_range=rotation_range,
+      width_shift_range=width_shift_range,
+      height_shift_range=height_shift_range,
+      zoom_range=zoom_range,
+      brightness_range=brightness_range,
+      horizontal_flip=horizontal_flip,
+      vertical_flip=vertical_flip, 
+      fill_mode=fill_mode
+  )
+
+  balanced_X = []
+  balanced_y = []
+
+  target_count = target_count if target_count else max(df['emotion'].value_counts())
+
+  distribution = []
+
+  for class_label in df['emotion'].unique():
+      class_indices = np.where(y[:, class_label] == 1)[0]
+      class_images = X[class_indices]
+      class_labels = y[class_indices]
+      num_images = class_images.shape[0]
+      
+      augmentations_needed = target_count
+      
+      while True:
+          for img, label in zip(class_images, class_labels):
+              if (augmentations_needed <= 0):
+                break
+              img = img.reshape((1,) + img.shape)
+              label = label.reshape((1,) + label.shape)
+              augmented_img = next(datagen.flow(img))
+              balanced_X.append(augmented_img.squeeze())
+              balanced_y.append(label.squeeze())
+              augmentations_needed -= 1
+          if (augmentations_needed <= 0):
+                break
+
   balanced_X = np.array(balanced_X)
   balanced_y = np.array(balanced_y)
 
