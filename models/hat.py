@@ -109,7 +109,8 @@ class WindowbasedMultiheadedSelfAttention(layers.Layer):
         return {
             'qkv': self.qkv,
             'proj': self.proj,
-            'bias': self.relative_position_bias_table
+            'relative_position_bias_table': self.relative_position_bias_table,
+            'relative_position_index': self.relative_position_index.numpy()
         }
     
 
@@ -201,7 +202,8 @@ class OverlapCrossAttention(layers.Layer):
             'q': self.q,
             'kv': self.kv,
             'proj': self.proj,
-            'bias': self.relative_position_bias_table
+            'relative_position_bias_table': self.relative_position_bias_table,
+            'relative_position_index': self.relative_position_index.numpy()
         }
     
 
