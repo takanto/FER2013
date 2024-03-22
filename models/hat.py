@@ -334,7 +334,8 @@ class HybridAttentionBlock(layers.Layer):
         return {
             'eca': self.eca,
             'attn': self.attn,
-            'mlp': self.mlp
+            'mlp': self.mlp,
+            'attn_mask': self.attn_mask.numpy()
         }
     
 
