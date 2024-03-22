@@ -45,6 +45,7 @@ class WindowbasedMultiheadedSelfAttention(layers.Layer):
             2 * self.window_size[1] - 1
         )
         self.relative_position_bias_table = self.add_weight(
+            name='wattn_bias',
             shape=(num_window_elements, self.num_heads),
             initializer=tf.keras.initializers.Zeros(),
             trainable=True,
@@ -132,6 +133,7 @@ class OverlapCrossAttention(layers.Layer):
 
         num_window_elements = ((self.M+self.Mo) - 2) * (2 * self.Mo) + 1
         self.relative_position_bias_table = self.add_weight(
+            name='oca_bias',
             shape=(num_window_elements, self.num_heads),
             initializer=tf.keras.initializers.Zeros(),
             trainable=True,
