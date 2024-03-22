@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import layers
 import numpy as np
 
+@tf.keras.saving.register_keras_serializable()
 class WindowbasedMultiheadedSelfAttention(layers.Layer):
     def __init__(self, dim, window_size, num_heads, qkv_bias=True, dropout_rate=0.0, **kwargs,):
         super(WindowbasedMultiheadedSelfAttention, self).__init__(**kwargs)
@@ -17,6 +18,7 @@ class WindowbasedMultiheadedSelfAttention(layers.Layer):
             2 * self.window_size[1] - 1
         )
         self.relative_position_bias_table = self.add_weight(
+            name='wattn_bias',
             shape=(num_window_elements, self.num_heads),
             initializer=tf.keras.initializers.Zeros(),
             trainable=True,
@@ -76,6 +78,15 @@ class WindowbasedMultiheadedSelfAttention(layers.Layer):
         x_qkv = self.dropout(x_qkv)
         return x_qkv
     
+    def get_config(self):
+        return {
+            'qkv': self.qkv,
+            'proj': self.proj,
+            'relative_position_bias_table': self.relative_position_bias_table.numpy(),
+            'relative_position_index': self.relative_position_index.numpy()
+        }
+    
+@tf.keras.saving.register_keras_serializable()
 class SwinTransformer(layers.Layer):
     def __init__(self, dim, num_patch, num_heads, window_size=7, shift_size=0, num_mlp=1024, qkv_bias=True, dropout_rate=0.0, **kwargs,):
         super(SwinTransformer, self).__init__(**kwargs)
@@ -194,6 +205,13 @@ class SwinTransformer(layers.Layer):
         x = self.drop_path(x)
         x = x_skip + x
         return x
+    
+    def get_config(self):
+        return {
+            'attn': self.attn,
+            'mlp': self.mlp,
+            'attn_mask': self.attn_mask.numpy()
+        }
 
 def window_partition(x, window_size, stride):
     batch_size, height, width, channels = x.shape
@@ -237,7 +255,7 @@ def patch_extract(images, patch_size):
     return tf.reshape(patches, (batch_size, patch_num * patch_num, patch_dim))
 
 
-
+@tf.keras.saving.register_keras_serializable()
 class PatchEmbedding(layers.Layer):
     def __init__(self, num_patch, embed_dim, **kwargs):
         super().__init__(**kwargs)
@@ -248,10 +266,16 @@ class PatchEmbedding(layers.Layer):
     def call(self, patch):
         pos = tf.range(start=0, limit=self.num_patch)
         return self.proj(patch) + self.pos_embed(pos)
+    
+    def get_config(self):
+        return {
+            'proj': self.proj,
+            'pos_embed': self.pos_embed
+        }
 
 
 
-
+@tf.keras.saving.register_keras_serializable()
 class PatchMerging(layers.Layer):
     def __init__(self, num_patch, embed_dim, **kwargs):
         super().__init__(**kwargs)
@@ -270,3 +294,8 @@ class PatchMerging(layers.Layer):
         x = tf.concat((x0, x1, x2, x3), axis=-1)
         x = tf.reshape(x, (-1, (height // 2) * (width // 2), 4 * C))
         return self.linear_trans(x)
+    
+    def get_config(self):
+        return {
+            'linear_trans': self.linear_trans,
+        }
