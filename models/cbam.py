@@ -10,10 +10,10 @@ class ChannelAttention(layers.Layer):
         self.pool_types = pool_types
 
     def build(self, input_shape):
-        num_channels = input_shape[-1]
+        # num_channels = input_shape[-1]
         self.mlp = tf.keras.Sequential([
-            layers.Dense(num_channels // self.reduction_ratio, activation='relu'),
-            layers.Dense(num_channels, activation='sigmoid')
+            layers.Dense(self.num_channels // self.reduction_ratio, activation='relu'),
+            layers.Dense(self.num_channels, activation='sigmoid')
         ])
 
     def call(self, x):
@@ -137,10 +137,9 @@ class ChannelBlockAttentionBlock(layers.Layer):
         self.sa = SpatialAttention(kernel_size=self.kernel_size)
 
     def call(self, x):
-        x_skip = x
         out = self.ca(x)
         out = self.sa(out)
-        return out + x_skip
+        return out
     
     def get_config(self):
         return {
@@ -157,10 +156,9 @@ class EfficientChannelBlockAttentionBlock(layers.Layer):
         self.sa = SpatialAttention(kernel_size=kernel_size)
 
     def call(self, x):
-        x_skip = x
         out = self.ca(x)
         out = self.sa(out)
-        return out + x_skip
+        return out
     
     def get_config(self):
         return {
