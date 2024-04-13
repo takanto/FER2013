@@ -36,23 +36,25 @@ class ChannelAttention(layers.Layer):
 
     def build(self, input_shape):
         self.filters = input_shape[-1]
-        self.conv = layers.Conv1D(filters=1, kernel_size=self.k_size, padding='same', kernel_initializer='glorot_uniform', use_bias=False,)
-
+        self.conv1 = layers.Conv1D(filters=1, kernel_size=self.k_size, padding='same', kernel_initializer='glorot_uniform', use_bias=False,)
+        self.conv2 = layers.Conv1D(filters=1, kernel_size=self.k_size, padding='same', kernel_initializer='glorot_uniform', use_bias=False,)
+    
     def call(self, x):
         _, H, W, C = x.shape
         squeeze = tf.reduce_mean(x, axis=[1, 2], keepdims=True)
-        attn = self.conv(squeeze)
+        attn = self.conv1(squeeze)
         attn = tf.squeeze(attn, axis=1)
         attn = tf.math.sigmoid(attn)
         attn = tf.expand_dims(attn, axis=1)
-        attn = self.conv(attn)
+        attn = self.conv2(attn)
         x =  x * attn
         x = tf.reshape(x, (-1, H*W, C))
         return x
     
     def get_config(self):
         return {
-            'conv': self.conv,
+            'conv1': self.conv1,
+            'conv2': self.conv2,
         }
     
 
