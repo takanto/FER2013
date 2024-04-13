@@ -147,13 +147,13 @@ class GraphAttentionV2(layers.Layer):
     
 @tf.keras.saving.register_keras_serializable()
 class DiscreteMultiHeadGraphAttentionV2(layers.Layer):
-    def __init__(self, num_heads, num_features, num_filters, num_nodes, threshold, in_drop, coef_drop, residual=False):
+    def __init__(self, num_heads, num_features, num_filters, threshold, in_drop, coef_drop, residual=False):
         super(DiscreteMultiHeadGraphAttentionV2, self).__init__()
         self.num_heads = num_heads
         self.threshold = threshold
         self.attention_heads = []
         for _ in range(num_heads):
-            self.attention_heads.append(GraphAttentionV2(num_features, num_filters, num_nodes, in_drop, coef_drop, residual))
+            self.attention_heads.append(GraphAttentionV2(num_features, num_filters, in_drop, coef_drop, residual))
 
     def call(self, x, distance_matrix):
         A = tf.cast(distance_matrix<self.threshold, tf.float32)
@@ -167,12 +167,12 @@ class DiscreteMultiHeadGraphAttentionV2(layers.Layer):
     
 @tf.keras.saving.register_keras_serializable()
 class MultiHeadGraphAttentionV2(layers.Layer):
-    def __init__(self, num_heads, num_features, num_filters, num_nodes, in_drop, coef_drop, residual=False):
+    def __init__(self, num_heads, num_features, num_filters, in_drop, coef_drop, residual=False):
         super(MultiHeadGraphAttentionV2, self).__init__()
         self.num_heads = num_heads
         self.attention_heads = []
         for _ in range(num_heads):
-            self.attention_heads.append(GraphAttentionV2(num_features, num_filters, num_nodes, in_drop, coef_drop, residual))
+            self.attention_heads.append(GraphAttentionV2(num_features, num_filters, in_drop, coef_drop, residual))
 
     def call(self, x, distance_matrix):
         A = distance_matrix
