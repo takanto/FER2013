@@ -96,18 +96,17 @@ class MultiHeadGraphAttention(layers.Layer):
 
 @tf.keras.saving.register_keras_serializable()
 class GraphAttentionV2(layers.Layer):
-    def __init__(self, num_features, num_filters, num_nodes, in_drop, coef_drop, residual=False):
+    def __init__(self, num_features, num_filters, in_drop, coef_drop, residual=False):
         super(GraphAttentionV2, self).__init__()
         self.num_features = num_features
         self.num_filters = num_filters
         self.in_drop = in_drop
         self.coef_drop = coef_drop
         self.residual = residual
-        self.num_nodes = num_nodes
 
     def build(self, input_shape):
         self.conv1d = layers.Conv1D(1, kernel_size=1, use_bias=False)
-        self.a = layers.Conv1D(self.num_nodes, kernel_size=1)
+        self.a = layers.Conv1D(1, kernel_size=1)
         self.leaky_relu = layers.LeakyReLU(0.2)
         self.bias = tf.Variable(initial_value=tf.zeros(shape=(self.num_filters)))
 
@@ -117,8 +116,8 @@ class GraphAttentionV2(layers.Layer):
 
         x_skip = x
 
-        x = self.conv1d(x)
         x_ij = x+tf.transpose(x, [0,2,1])
+        x_ij = self.conv1d(x_ij)
         e = self.leaky_relu(x_ij)
         e = self.a(x_ij)
         a = tf.nn.softmax(e+A)
