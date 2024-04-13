@@ -44,8 +44,8 @@ class ChannelAttention(layers.Layer):
         attn = self.conv(squeeze)
         attn = tf.squeeze(attn, axis=1)
         attn = tf.math.sigmoid(attn)
-        attn = self.conv(attn)
         attn = tf.expand_dims(attn, axis=1)
+        attn = self.conv(attn)
         x =  x * attn
         x = tf.reshape(x, (-1, H*W, C))
         return x
