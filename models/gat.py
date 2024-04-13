@@ -118,7 +118,7 @@ class GraphAttentionV2(layers.Layer):
 
         x_i = self.conv1d(x)
         x_j = self.conv1d(x)
-        x_ij = x_i + tf.transpose(x_j, axis=-1)
+        x_ij = x_i + tf.transpose(x_j, [0,2,1])
         e = self.leaky_relu(x_ij)
         e = self.a(x_ij)
         e = tf.squeeze(e, axis=-1)
