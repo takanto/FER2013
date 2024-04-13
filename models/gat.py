@@ -116,11 +116,9 @@ class GraphAttentionV2(layers.Layer):
 
         x_skip = x
 
-
-        x_i = tf.expand_dims(x, axis=2)
-        x_j = tf.transpose(x_i, perm=[0, 2, 1, 3])
-        x_ij = x_i + x_j
-        x_ij = self.conv1d(x_ij)
+        x_i = self.conv1d(x)
+        x_j = self.conv1d(x)
+        x_ij = x_i + tf.transpose(x_j, axis=-1)
         e = self.leaky_relu(x_ij)
         e = self.a(x_ij)
         e = tf.squeeze(e, axis=-1)
@@ -131,7 +129,7 @@ class GraphAttentionV2(layers.Layer):
         if self.in_drop != 0.0:
             x = tf.nn.dropout(x, 1.0 - self.in_drop)
         
-        x = tf.matmul(a, x_ij)
+        x = tf.matmul(a, x_i)
         x = x + self.bias
         
         if self.residual:
