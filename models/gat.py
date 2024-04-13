@@ -96,55 +96,47 @@ class MultiHeadGraphAttention(layers.Layer):
 
 @tf.keras.saving.register_keras_serializable()
 class GraphAttentionV2(layers.Layer):
-    def __init__(self, num_features, num_filters, in_drop, coef_drop, residual=False):
+    def __init__(self, num_features, num_filters, in_drop, coef_drop, residual):
         super(GraphAttentionV2, self).__init__()
         self.num_features = num_features
         self.num_filters = num_filters
         self.in_drop = in_drop
         self.coef_drop = coef_drop
         self.residual = residual
-
-    def build(self, input_shape):
-        self.conv1d = layers.Conv1D(self.num_filters, kernel_size=1, use_bias=False)
-        self.a = layers.Conv1D(1, kernel_size=1)
-        self.leaky_relu = layers.LeakyReLU(0.2)
-        self.bias = tf.Variable(initial_value=tf.zeros(shape=(self.num_filters)))
+        
+        # Define layers
+        self.W = tf.keras.layers.Dense(num_filters)
+        self.a = tf.keras.layers.Dense(1)
+        self.leaky_relu = tf.keras.layers.LeakyReLU(alpha=0.2)
 
     def call(self, x, A):
         if self.in_drop != 0.0:
             x = tf.nn.dropout(x, 1.0 - self.in_drop)
+        x_skip = x # Assuming inputs is the input tensor of shape (batch_size, num_nodes, num_features)
 
-        x_skip = x
-
-        x_i = self.conv1d(x)
-        x_j = self.conv1d(x)
-        x_ij = x_i + tf.transpose(x_j, [0,2,1])
-        e = self.leaky_relu(x_ij)
-        e = self.a(x_ij)
-        e = tf.squeeze(e, axis=-1)
-        a = tf.nn.softmax(e+A)
+        # Self-attention mechanism
+        a_input = tf.expand_dims(x, axis=2)
+        e = self.leaky_relu(self.a(self.W(a_input)))
+        e = tf.squeeze(e, axis=-1)  # Remove last dimension
+        a = tf.nn.softmax(e+A, axis=-1)
 
         if self.coef_drop != 0.0:
             a = tf.nn.dropout(a, 1.0 - self.coef_drop)
         if self.in_drop != 0.0:
             x = tf.nn.dropout(x, 1.0 - self.in_drop)
-        
-        x = tf.matmul(a, x_i)
-        x = x + self.bias
+
+        # Compute output using attention coefficients
+        x = tf.matmul(a, x)
         
         if self.residual:
-            if x_skip.shape[-1] != x.shape[-1]:
-                x = x + self.conv1d(x_skip)
-            else:
-                x = x + x_skip
+            x = x + x_skip
         return x
     
     def get_config(self):
         return {
-            'conv1d': self.conv1d,
+            'W': self.W,
             'a': self.a,
             'leaky_relu': self.leaky_relu,
-            "bias": self.bias.numpy(),
         }
     
 @tf.keras.saving.register_keras_serializable()
