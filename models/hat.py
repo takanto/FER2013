@@ -31,7 +31,7 @@ class EfficientChannelAttention(layers.Layer):
 @tf.keras.saving.register_keras_serializable()
 class ChannelAttention(layers.Layer):
     def __init__(self, k_size=3, **kwargs):
-        super(EfficientChannelAttention, self).__init__(**kwargs)
+        super(ChannelAttention, self).__init__(**kwargs)
         self.k_size = k_size
 
     def build(self, input_shape):
