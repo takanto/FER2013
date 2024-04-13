@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers
 
+@tf.keras.saving.register_keras_serializable()
 class ChannelAttention(layers.Layer):
     def __init__(self, num_channels, reduction_ratio=16, pool_types=['avg', 'max']):
         super(ChannelAttention, self).__init__()
@@ -37,6 +38,12 @@ class ChannelAttention(layers.Layer):
         x = tf.reshape(x, (-1, H, W, C))
         return x
     
+    def get_config(self):
+        return {
+            'mlp': self.mlp,
+        }
+    
+@tf.keras.saving.register_keras_serializable()
 class EfficientChannelAttention(layers.Layer):
     def __init__(self, k_size=3, **kwargs):
         super(EfficientChannelAttention, self).__init__(**kwargs)
@@ -55,7 +62,13 @@ class EfficientChannelAttention(layers.Layer):
         attn = tf.expand_dims(attn, axis=1)
         x =  x * attn
         return x
+    
+    def get_config(self):
+        return {
+            'conv': self.conv,
+        }
 
+@tf.keras.saving.register_keras_serializable()
 class BasicConv(layers.Layer):
     def __init__(self, out_planes, kernel_size, stride=1, padding='same', dilation=1, groups=1, relu=True, bn=True, bias=False):
         super(BasicConv, self).__init__()
@@ -71,8 +84,15 @@ class BasicConv(layers.Layer):
         if self.relu is not None:
             x = self.relu(x)
         return x
+    
+    def get_config(self):
+        return {
+            'conv': self.conv,
+            'bn': self.bn,
+            'relu': self.relu
+        }
 
-
+@tf.keras.saving.register_keras_serializable()
 class ChannelPool(layers.Layer):
     def __init__(self):
         super(ChannelPool, self).__init__()
@@ -83,6 +103,7 @@ class ChannelPool(layers.Layer):
         return tf.concat([max_pool, mean_pool], axis=3)
 
 
+@tf.keras.saving.register_keras_serializable()
 class SpatialAttention(layers.Layer):
     def __init__(self, kernel_size=7):
         super(SpatialAttention, self).__init__()
@@ -96,8 +117,14 @@ class SpatialAttention(layers.Layer):
         scale = tf.sigmoid(x_out)
         x = x * scale
         return x
+    
+    def get_config(self):
+        return {
+            'compress': self.compress,
+            'spatial': self.spatial,
+        }
 
-
+@tf.keras.saving.register_keras_serializable()
 class ChannelBlockAttentionBlock(layers.Layer):
     def __init__(self, num_channels=512, reduction=16, kernel_size=49):
         super(ChannelBlockAttentionBlock, self).__init__()
@@ -115,6 +142,14 @@ class ChannelBlockAttentionBlock(layers.Layer):
         out = self.sa(out)
         return out + x_skip
     
+    def get_config(self):
+        return {
+            'ca': self.ca,
+            'sa': self.sa,
+        }
+    
+    
+@tf.keras.saving.register_keras_serializable()
 class EfficientChannelBlockAttentionBlock(layers.Layer):
     def __init__(self, kernel_size=49):
         super(EfficientChannelBlockAttentionBlock, self).__init__()
@@ -126,3 +161,9 @@ class EfficientChannelBlockAttentionBlock(layers.Layer):
         out = self.ca(x)
         out = self.sa(out)
         return out + x_skip
+    
+    def get_config(self):
+        return {
+            'ca': self.ca,
+            'sa': self.sa,
+        }

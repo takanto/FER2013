@@ -1,9 +1,10 @@
 import tensorflow as tf
 from tensorflow.keras import layers
 
-class DistanceGraphConvolution(layers.Layer):
+@tf.keras.saving.register_keras_serializable()
+class DecayGraphConvolution(layers.Layer):
     def __init__(self, num_features, num_filters):
-        super(DistanceGraphConvolution, self).__init__()
+        super(DecayGraphConvolution, self).__init__()
         self.num_features = num_features
         self.num_filters = num_filters
         self.W = self.add_weight(shape=(num_features, num_filters),
@@ -20,9 +21,14 @@ class DistanceGraphConvolution(layers.Layer):
         x = tf.matmul(x, self.W)
         return x
     
-class GraphConvolution(layers.Layer):
+    def get_config(self):
+        return {
+            'W': self.W,
+        }
+    
+class DiscreteGraphConvolution(layers.Layer):
     def __init__(self, num_features, num_filters, threshold):
-        super(GraphConvolution, self).__init__()
+        super(DiscreteGraphConvolution, self).__init__()
         self.num_features = num_features
         self.num_filters = num_filters
         self.threshold = threshold
@@ -40,7 +46,12 @@ class GraphConvolution(layers.Layer):
         x = tf.matmul(x, self.W)
         return x
     
-class PlainGraphConvolution(layers.Layer):
+    def get_config(self):
+        return {
+            'W': self.W,
+        }
+    
+class GraphConvolution(layers.Layer):
     def __init__(self, num_features, num_filters, threshold):
         super(GraphConvolution, self).__init__()
         self.num_features = num_features
@@ -59,3 +70,8 @@ class PlainGraphConvolution(layers.Layer):
         x = tf.matmul(A, x)
         x = tf.matmul(x, self.W)
         return x
+    
+    def get_config(self):
+        return {
+            'W': self.W,
+        }

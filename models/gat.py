@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers
 
+@tf.keras.saving.register_keras_serializable()
 class GraphAttention(layers.Layer):
     def __init__(self, num_features, num_filters, in_drop, coef_drop, residual=False):
         super(GraphAttention, self).__init__()
@@ -45,9 +46,18 @@ class GraphAttention(layers.Layer):
                 x = x + x_skip
         return x
     
-class MultiHeadGraphAttention(layers.Layer):
+    def get_config(self):
+        return {
+            'conv1d': self.conv1d,
+            'a': self.a,
+            'leaky_relu': self.leaky_relu,
+            "bias": self.bias.numpy(),
+        }
+    
+@tf.keras.saving.register_keras_serializable()
+class DiscreteMultiHeadGraphAttention(layers.Layer):
     def __init__(self, num_heads, num_features, num_filters, threshold, in_drop, coef_drop, residual=False):
-        super(MultiHeadGraphAttention, self).__init__()
+        super(DiscreteMultiHeadGraphAttention, self).__init__()
         self.num_heads = num_heads
         self.threshold = threshold
         self.attention_heads = []
@@ -59,7 +69,13 @@ class MultiHeadGraphAttention(layers.Layer):
         head_outputs = [head(x, A) for head in self.attention_heads]
         return tf.reduce_mean(head_outputs, axis=0)
     
-class PlainMultiHeadGraphAttention(layers.Layer):
+    def get_config(self):
+        return {
+            'attention_heads': self.attention_heads,
+        }
+
+@tf.keras.saving.register_keras_serializable() 
+class MultiHeadGraphAttention(layers.Layer):
     def __init__(self, num_heads, num_features, num_filters, threshold, in_drop, coef_drop, residual=False):
         super(MultiHeadGraphAttention, self).__init__()
         self.num_heads = num_heads
@@ -72,7 +88,13 @@ class PlainMultiHeadGraphAttention(layers.Layer):
         A = distance_matrix
         head_outputs = [head(x, A) for head in self.attention_heads]
         return tf.reduce_mean(head_outputs, axis=0)
+    
+    def get_config(self):
+        return {
+            'attention_heads': self.attention_heads,
+        }
 
+@tf.keras.saving.register_keras_serializable()
 class GraphAttentionV2(layers.Layer):
     def __init__(self, num_features, num_filters, num_nodes, in_drop, coef_drop, residual=False):
         super(GraphAttentionV2, self).__init__()
@@ -82,10 +104,6 @@ class GraphAttentionV2(layers.Layer):
         self.coef_drop = coef_drop
         self.residual = residual
         self.num_nodes = num_nodes
-        self.conv1d = layers.Conv1D(1, kernel_size=1, use_bias=False)
-        self.a = layers.Conv1D(num_nodes, kernel_size=1)
-        self.leaky_relu = layers.LeakyReLU(0.2)
-        self.bias = tf.Variable(initial_value=tf.zeros(shape=(num_filters)))
 
     def build(self, input_shape):
         self.conv1d = layers.Conv1D(1, kernel_size=1, use_bias=False)
@@ -120,9 +138,18 @@ class GraphAttentionV2(layers.Layer):
                 x = x + x_skip
         return x
     
-class MultiHeadGraphAttentionV2(layers.Layer):
+    def get_config(self):
+        return {
+            'conv1d': self.conv1d,
+            'a': self.a,
+            'leaky_relu': self.leaky_relu,
+            "bias": self.bias.numpy(),
+        }
+    
+@tf.keras.saving.register_keras_serializable()
+class DiscreteMultiHeadGraphAttentionV2(layers.Layer):
     def __init__(self, num_heads, num_features, num_filters, num_nodes, threshold, in_drop, coef_drop, residual=False):
-        super(MultiHeadGraphAttentionV2, self).__init__()
+        super(DiscreteMultiHeadGraphAttentionV2, self).__init__()
         self.num_heads = num_heads
         self.threshold = threshold
         self.attention_heads = []
@@ -134,11 +161,16 @@ class MultiHeadGraphAttentionV2(layers.Layer):
         head_outputs = [head(x, A) for head in self.attention_heads]
         return tf.reduce_mean(head_outputs, axis=0)
     
-class PlainMultiHeadGraphAttentionV2(layers.Layer):
-    def __init__(self, num_heads, num_features, num_filters, num_nodes, threshold, in_drop, coef_drop, residual=False):
+    def get_config(self):
+        return {
+            'attention_heads': self.attention_heads,
+        }
+    
+@tf.keras.saving.register_keras_serializable()
+class MultiHeadGraphAttentionV2(layers.Layer):
+    def __init__(self, num_heads, num_features, num_filters, num_nodes, in_drop, coef_drop, residual=False):
         super(MultiHeadGraphAttentionV2, self).__init__()
         self.num_heads = num_heads
-        self.threshold = threshold
         self.attention_heads = []
         for _ in range(num_heads):
             self.attention_heads.append(GraphAttentionV2(num_features, num_filters, num_nodes, in_drop, coef_drop, residual))
@@ -147,3 +179,8 @@ class PlainMultiHeadGraphAttentionV2(layers.Layer):
         A = distance_matrix
         head_outputs = [head(x, A) for head in self.attention_heads]
         return tf.reduce_mean(head_outputs, axis=0)
+    
+    def get_config(self):
+        return {
+            'attention_heads': self.attention_heads,
+        }

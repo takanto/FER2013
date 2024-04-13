@@ -36,7 +36,7 @@ def point_wise_feed_forward_network(d_model, d_ff, activation):
         ]
     )
 
-
+@tf.keras.saving.register_keras_serializable()
 class MultiHeadAttention(layers.Layer):
     def __init__(self, d_model, num_heads, depth, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
@@ -88,8 +88,16 @@ class MultiHeadAttention(layers.Layer):
         output = self.dense(concat_attention)
 
         return output, attention_weights
+    
+    def get_config(self):
+        return {
+            'wq': self.wq,
+            'wk':self.wk,
+            'wv': self.wv,
+            'dense': self.dense,
+        }
 
-
+@tf.keras.saving.register_keras_serializable()
 class TransformerEncoderLayer(layers.Layer):
     def __init__(self, d_model, num_heads, d_ff, dropout, activation, **kwargs):
         super(TransformerEncoderLayer, self).__init__(**kwargs)
@@ -131,8 +139,18 @@ class TransformerEncoderLayer(layers.Layer):
         out2 = self.layernorm2(out1 + ffn_output)
 
         return out2
+    
+    def get_config(self):
+        return {
+            'mha': self.mha,
+            'layernorm1':self.layernorm1,
+            'layernorm2': self.layernorm2,
+            'dropout1': self.dropout1,
+            'dropout2': self.dropout2,
+        }
 
 
+@tf.keras.saving.register_keras_serializable()
 class TransformerEncoder(layers.Layer):
     def __init__(
         self, d_model, num_heads, d_ff, dropout, activation, n_layers, **kwargs
@@ -164,7 +182,7 @@ class TransformerEncoder(layers.Layer):
 
         return x
 
-
+@tf.keras.saving.register_keras_serializable()
 class Patches(layers.Layer):
     def __init__(self, patch_size, **kwargs):
         super(Patches, self).__init__(**kwargs)
@@ -189,7 +207,7 @@ class Patches(layers.Layer):
         patches = tf.reshape(patches, [batch_size, -1, patch_dims])
         return patches
 
-
+@tf.keras.saving.register_keras_serializable()
 class PatchClassEmbedding(layers.Layer):
     def __init__(self, d_model, n_patches, kernel_initializer="he_normal", **kwargs):
         super(PatchClassEmbedding, self).__init__(**kwargs)
