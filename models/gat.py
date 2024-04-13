@@ -116,10 +116,14 @@ class GraphAttentionV2(layers.Layer):
 
         x_skip = x
 
-        x_ij = x+tf.transpose(x, [0,2,1])
+
+        x_i = tf.expand_dims(x, axis=2)
+        x_j = tf.transpose(x_i, perm=[0, 2, 1, 3])
+        x_ij = x_i + x_j
         x_ij = self.conv1d(x_ij)
         e = self.leaky_relu(x_ij)
         e = self.a(x_ij)
+        e = tf.squeeze(e, axis=-1)
         a = tf.nn.softmax(e+A)
 
         if self.coef_drop != 0.0:
