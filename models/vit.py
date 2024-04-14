@@ -144,6 +144,11 @@ class TransformerEncoder(layers.Layer):
         self.dropout = dropout
         self.activation = activation
         self.n_layers = n_layers
+
+        self.encoder_layers = [
+            TransformerEncoderLayer(self.d_model, self.num_heads, self.d_ff, self.dropout, self.activation)
+            for i in range(self.n_layers)
+        ]
         
 
     def get_config(self):
@@ -151,12 +156,6 @@ class TransformerEncoder(layers.Layer):
 
         base_config = super(TransformerEncoder, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
-    
-    def build(self, input_shape):
-        self.encoder_layers = [
-            TransformerEncoderLayer(self.d_model, self.num_heads, self.d_ff, self.dropout, self.activation)
-            for i in range(self.n_layers)
-        ]
 
     def call(self, x):
         for i in range(self.n_layers):

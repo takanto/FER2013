@@ -2,45 +2,40 @@ import tensorflow as tf
 from tensorflow.keras import layers
 
 @tf.keras.saving.register_keras_serializable()
-class ChannelAttention(layers.Layer):
-    def __init__(self, num_channels, reduction_ratio=16, pool_types=['avg', 'max']):
+class ChannelAttention(tf.keras.layers.Layer):
+    def __init__(self, num_channels, ratio=16):
         super(ChannelAttention, self).__init__()
+        self.avg_pool = tf.keras.layers.GlobalAveragePooling2D()
+        self.max_pool = tf.keras.layers.GlobalMaxPooling2D()
         self.num_channels = num_channels
-        self.reduction_ratio = reduction_ratio
-        self.pool_types = pool_types
-
-    def build(self, input_shape):
-        # num_channels = input_shape[-1]
-        self.mlp = tf.keras.Sequential([
-            layers.Dense(self.num_channels // self.reduction_ratio, activation='relu'),
-            layers.Dense(self.num_channels, activation='sigmoid')
-        ])
+        self.conv = tf.keras.layers.Conv2D(num_channels//ratio, kernel_size=3, padding='same', use_bias=False)
+        self.relu = tf.keras.layers.ReLU()
+        self.conv2 = tf.keras.layers.Conv2D(num_channels, kernel_size=3, padding='same', use_bias=False)
+        self.sigmoid = tf.keras.layers.Activation('sigmoid')
 
     def call(self, x):
-        _, H, W, C = x.shape
-        channel_att_sum = None
-        for pool_type in self.pool_types:
-            if pool_type == 'avg':
-                avg_pool = tf.reduce_mean(x, axis=[1, 2], keepdims=True)
-                #avg_pool = tf.reshape(avg_pool, (tf.shape(avg_pool)[0], -1))
-                channel_att_raw = self.mlp(avg_pool)
-            elif pool_type == 'max':
-                max_pool = tf.reduce_max(x, axis=[1, 2], keepdims=True)
-                #max_pool = tf.reshape(max_pool, (tf.shape(max_pool)[0], -1))
-                channel_att_raw = self.mlp(max_pool)
-            if channel_att_sum is None:
-                channel_att_sum = channel_att_raw
-            else:
-                channel_att_sum = channel_att_sum + channel_att_raw
+        avg_in = self.avg_pool(x)[:, tf.newaxis, tf.newaxis, :]
+        avg_in = self.conv(avg_in)
+        avg_in = self.relu(avg_in)
+        avg_out = self.conv2(avg_in)
 
-        scale = tf.expand_dims(tf.expand_dims(channel_att_sum, axis=1), axis=1)
-        x = x * scale
-        x = tf.reshape(x, (-1, H, W, C))
-        return x
+        max_in = self.max_pool(x)[:, tf.newaxis, tf.newaxis, :]
+        max_in = self.conv(max_in)
+        max_in = self.relu(max_in)
+        max_out = self.conv2(max_in)
+
+        out = avg_out + max_out
+        attn = self.sigmoid(out)
+        return x*attn
     
     def get_config(self):
         return {
-            'mlp': self.mlp,
+            'avg_pool': self.avg_pool,
+            'max_pool': self.max_pool,
+            'conv': self.conv,
+            'relu': self.relu,
+            'conv2': self.conv2,
+            'sigmoid': self.sigmoid
         }
     
 @tf.keras.saving.register_keras_serializable()
@@ -133,7 +128,7 @@ class ChannelBlockAttentionBlock(layers.Layer):
         self.kernel_size = kernel_size
 
     def build(self, input_shape):
-        self.ca = ChannelAttention(num_channels=self.num_channels, reduction_ratio=self.reduction)
+        self.ca = ChannelAttention(num_channels=self.num_channels, ratio=self.reduction)
         self.sa = SpatialAttention(kernel_size=self.kernel_size)
 
     def call(self, x):
