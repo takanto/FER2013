@@ -1,5 +1,5 @@
 # FER2013
-This project is designed to provide developers with a range of pretrained models trained on FER2013. The project includes TensorFlow implementations of sophisticated deep learning models, Google Colab Notebooks, and TFLite files. 
+This project is designed to provide developers with a range of pretrained models trained on FER2013. The project includes TensorFlow implementations of sophisticated deep learning models and Google Colab Notebooks. 
 
 ## Dataset
 FER2013 comprises 35,887 RGB images of faces, each with dimensions (48, 48, 3). These images represent 7 distinct emotions: happy, sad, angry, surprised, disgust, fear, and neutral (Verma, R., 2018). The dataset was curated by conducting a Google image search for each emotion and its synonyms (Quinn, M., Sivesind, G., Reis, G., n.d.).
@@ -29,6 +29,37 @@ The following is the list of models available in this repository.
 3. **Graph Attention Network V2**: The second version introduces dynamic attention, enhancing the model's capabilities compared to the static attention in the first version.
 
 See the Google Colab Notebooks stored in notebook folder for implementation details. 
+
+## Hyperparameter Tuning
+The notebooks for Transfer Learning models utilize Ray Tune and Train for fine-tuning. 
+
+## Results
+The following is the result after performing 3 trials for each model. 
+### CNNs
+|Models |#.Param. |Accuracy |WA F1-Score |
+| :--- | :--- | :--- |:---: |
+|VGG16 |14.7M |42.8%±0.33 |42.2%±0.54 |
+|ResNet-50 |32.0M |43.0%±0.61 |41.1%±0.78 |
+|MobileNetV2 |11.0M |42.9%±0.29 |42.1%±0.51 |
+|CBAM |307K |39.1%±1.20 |38.7%±1.15 |
+|**E-CBAM** |**234K** |**45.1%±0.86** |**43.9%±1.13** |
+
+### Transformers
+|Models |#.Param. |Accuracy |WA F1-Score |
+| :--- | :--- | :--- |:---: |
+|ViT |1.05M |37.7%±0.43 |35.9%±0.32 |
+|Hybrid ViT |3.29M |40.3%±0.41 |40.1%±0.29 |
+|Swin-Transformer |1.37M |31.9%±0.66 |30.7%±0.51 |
+|HAT |992K |44.8%±0.67 |42.2%±0.42 |
+|**E-HAT** |**992K** |**45.2%±0.51** |**44.1%±0.45** |
+
+### GNNs
+|Models |#.Param. |Accuracy |WA F1-Score |
+| :--- | :--- | :--- |:---: |
+|GCN |86.5K |39.3%±0.11 |34.8%±0.15 |
+|GAT |674K |40.5%±0.18 |38.4%±0.14 |
+|GATv2 |674K |40.6%±0.17 |38.5%±0.12 |
+
 
 ## References
 Brody, S. & Alon, U. & Yahav, E. 2022. How Attentive Are Graph Attention Networks? Arxiv. https://arxiv.org/pdf/2105.14491v3.pdf
